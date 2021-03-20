@@ -39,9 +39,12 @@ def cross_entropy_softmax_lost(X, C, W, with_eta=False):
     :param num_classes:
     :return:
     """
-    l = len(C)
+    l = len(C[0])  # why l?
     m = len(X[0])
     X_t = np.transpose(X)
     eta = max([np.matmul(X_t, W[:, i]) for i in range(0, l)]) if with_eta else 0
     softmax_denominator = np.sum(np.exp(np.matmul(X_t, W[:, j]) - eta) for j in range(0, l))
-    loss = (-1 / m) * np.sum(np.matmul(np.transpose(C[:, k]), np.log(np.exp(np.matmul(X_t, W[:, k])))) for k in range(0, l))
+    loss = (-1 / m) * np.sum(np.matmul(np.transpose(C[:, k]), np.log(np.exp(np.matmul(X_t, W[:, k])))) for k in range(0, l))  # should deviate
+    return loss
+
+cross_entropy_softmax_lost(X, C, W, with_eta=False)
