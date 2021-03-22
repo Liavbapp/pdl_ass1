@@ -25,18 +25,17 @@ def compute_softmax_gradient_vector_respect_to_weights(X, W, C, b):
     :param W: weights matrix - dimension: n x l
     :param C: classes vector matrix - dimension: l x m
     :param b: bias vector - length: l
-    :return:
+    :return: gradient vector - dimensions: each grad is n x 1 ,the grad list is of length 'l'
     """
     m = len(X[0])
-    l = len(C)
-    C_t = np.transpose(C)
+    l = len(C[0])
     X_t = np.transpose(X)
     denominator = sum([np.exp(np.matmul(X_t, W[:, k]) + b[k]) for k in range(0, l)])
     grads = []
     for p in range(0, l):
-        C_p = np.expand_dims(C[p], axis=1)
+        C_p = C[:, p]
         nominator = np.exp(np.matmul(X_t, W[:, p]) + b[p])
-        grads.append((1/m) * np.matmul(X, (nominator/denominator)-C_p))
+        grads.append((1/m) * np.matmul(X, (nominator/denominator) - C_p))
     return np.array(grads)
 
 

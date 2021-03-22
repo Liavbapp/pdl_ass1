@@ -14,25 +14,22 @@ class Tests(unittest.TestCase):
         :param X: data matrix - dimension: n x m
         :param C: classes vector matrix - dimension: l x m
         :param W: weights matrix - dimension: n x l
+        :param b: bias vector - length l
         :param num_classes:
         :return:
         """
-        X = np.array([[1, 2, 3],
-                      [3, 4, 4]])
+        X = np.array([[10, 2, 3]])
 
-        C = np.array([[0, 1, 0],
-                      [1, 0, 1]])
+        C = np.array([[0, 0],
+                      [0, 0],
+                      [1, 1]])
 
-        W = np.array([[2, 3],
-                      [5, 1]])
+        W = np.array([[1, 3]])
 
         b = np.array([0, 0])
 
-        expected_grads = np.array([[1.33326871, 2.33321921],
-                                   [-1.33326871, - 2.33321921]])
         actual_grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W, C, b)
-        print(forward.compute_softmax_gradient_vector_respect_to_weights(X, W, C, b))
-        #self.assertTrue(expected_grads == actual_grads)
+        print(actual_grads)
 
     def test_cross_entropy_softmax_lost_no_eta(self):
         """
