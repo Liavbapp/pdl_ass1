@@ -23,7 +23,7 @@ def compute_softmax_gradient_vector_respect_to_weights(X, W, C, b):
     """
     :param X: data matrix - dimension: n x m
     :param W: weights matrix - dimension: n x l
-    :param C: classes vector matrix - dimension: l x m
+    :param C: classes vector matrix - dimension: m x l
     :param b: bias vector - length: l
     :return: gradient vector - dimensions: each grad is n x 1 ,the grad list is of length 'l'
     """
