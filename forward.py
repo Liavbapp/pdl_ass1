@@ -28,10 +28,10 @@ def compute_softmax_gradient_vector_respect_to_weights(X, W, C, b):
     :return:
     """
     m = len(X[0])
-    l = len(C)
+    l = len(C[0])
     X_t = np.transpose(X)
     denominator = sum([np.exp(np.matmul(X_t, W[:, k]) + b[k]) for k in range(0, l)])
-    grads = np.array([(1 / m) * np.matmul(X, (np.exp(np.matmul(X_t, W[:, p]) + b[p]) / denominator) - C[p]) for p in
+    grads = np.array([(1 / m) * np.matmul(X, (np.exp(np.matmul(X_t, W[:, p]) + b[p]) / denominator) - C[:, p]) for p in
                       range(0, l)]).transpose()
     # grads = []
     # for p in range(0, l):
@@ -54,7 +54,7 @@ def cross_entropy_softmax_lost(X, C, W, b, with_eta=False):
     :param num_classes:
     :return:
     """
-    l = len(C)
+    l = len(C[0])
     m = len(X[0])
     X_t = np.transpose(X)
     eta_lst = [max([np.matmul(X_t[i], W[:, k]) + b[k] for k in range(0, l)]) for i in range(0, m)] if with_eta else [
@@ -63,7 +63,7 @@ def cross_entropy_softmax_lost(X, C, W, b, with_eta=False):
     loss = 0
     for k in range(0, l):
         softmax_prob = np.log(np.exp(np.matmul(X_t, W[:, k]) + b[k] - eta_lst) / softmax_denominator)
-        loss += np.matmul(C[k], softmax_prob)
+        loss += np.matmul(C[:, k], softmax_prob)
     loss *= (-1 / m)
 
     # loss = (-1 / m) * sum(

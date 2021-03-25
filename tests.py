@@ -18,8 +18,9 @@ class GradTests(unittest.TestCase):
                       [11, 3, 2],
                       [6, 1, 7]])  # n=3,  m=3
 
-        C = np.array([[1, 0, 1],
-                      [0, 1, 0]])  # l=2, m=3
+        C = np.array([[1, 0],
+                      [0, 1],
+                      [1, 0]])  # l=2, m=3
 
         W_0 = np.array([[1, 3],
                         [2, 4],
