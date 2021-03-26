@@ -8,6 +8,23 @@ from forward import cross_entropy_softmax_lost
 
 class Tests(unittest.TestCase):
 
+    def test_SGD_softmax(self):
+        X = np.array([[10, 5, 8],
+                      [11, 3, 2],
+                      [6, 1, 7]])  # n=3,  m=3
+
+        C = np.array([[1, 0],
+                      [0, 1],
+                      [1, 0]])  # l=2, m=3
+
+        W = np.array([[1, 3],
+                        [2, 4],
+                        [4, 6]])  # n=3, l=2
+
+        b = np.array([0, 0])
+
+        forward.SGD_softmax(X, W, C, b, lr=1e-05)
+
     def test_compute_softmax_gradient_vector_respect_to_weights(self):
         """
         computation of lost function

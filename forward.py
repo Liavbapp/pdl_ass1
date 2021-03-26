@@ -1,22 +1,13 @@
 import numpy as np
 
 
-def compute_softmax_gradient_vector_respect_to_data(X, W, C, b):
-    """
-    :param X: data matrix - dimension: n x m
-    :param W: weights matrix - dimension: n x l
-    :param C: classes vector matrix - dimension: l x m
-    :param b: bias vector - length: l
-    :return:
-    """
-    m = len(X[0])
-    l = len(C)
-    W_t = np.transpose(W)
-    b_t = np.expand_dims(b, 1)
-    nominator = np.exp(np.matmul(W_t, X) + b_t)
-    dominator = sum(np.exp(np.matmul(np.transpose(W[:, k]), X) + b[k]) for k in range(0, l))
-    grads = (1 / m) * np.matmul(W, (nominator / dominator) - C)
-    return grads
+def SGD_softmax(batch_X, W, C, b, lr):
+    batch_size = len(batch_X[0])
+    grads = compute_softmax_gradient_vector_respect_to_weights(batch_X, W, C, b)
+    W = W - lr * grads
+
+
+
 
 
 def compute_softmax_gradient_vector_respect_to_weights(X, W, C, b):
@@ -71,3 +62,40 @@ def cross_entropy_softmax_lost(X, C, W, b, with_eta=False):
     #     in range(0, l))
 
     return loss
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def compute_softmax_gradient_vector_respect_to_data(X, W, C, b):
+    """
+    :param X: data matrix - dimension: n x m
+    :param W: weights matrix - dimension: n x l
+    :param C: classes vector matrix - dimension: l x m
+    :param b: bias vector - length: l
+    :return:
+    """
+    m = len(X[0])
+    l = len(C)
+    W_t = np.transpose(W)
+    b_t = np.expand_dims(b, 1)
+    nominator = np.exp(np.matmul(W_t, X) + b_t)
+    dominator = sum(np.exp(np.matmul(np.transpose(W[:, k]), X) + b[k]) for k in range(0, l))
+    grads = (1 / m) * np.matmul(W, (nominator / dominator) - C)
+    return grads
