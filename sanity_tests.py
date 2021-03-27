@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
 
-import forward
+import forward_old
 
-from forward import cross_entropy_softmax_lost
+from forward_old import cross_entropy_softmax_lost
 
 
 class Tests(unittest.TestCase):
@@ -23,7 +23,7 @@ class Tests(unittest.TestCase):
 
         b = np.array([0, 0])
 
-        forward.SGD_softmax(X, W, C, b, lr=1e-05)
+        forward_old.SGD_softmax(X, W, C, b, lr=1e-05)
 
     def test_compute_softmax_gradient_vector_respect_to_weights(self):
         """
@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
 
         b = np.array([0, 0])
 
-        actual_grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W, C, b)
+        actual_grads = forward_old.compute_softmax_gradient_vector_respect_to_weights(X, W, C, b)
         print(actual_grads)
 
     def test_cross_entropy_softmax_lost_no_eta(self):
@@ -73,7 +73,7 @@ class Tests(unittest.TestCase):
         b = np.array([0, 0])
 
         expected_loss = 6.666698980663971
-        actual_loss = forward.cross_entropy_softmax_lost(X, C, W, b, with_eta=False)
+        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=False)
         self.assertTrue(expected_loss == actual_loss)
 
 
@@ -99,7 +99,7 @@ class Tests(unittest.TestCase):
         b = np.array([0, 0])
 
         expected_loss = 6.666698980663971
-        actual_loss = forward.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
+        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
         self.assertTrue(expected_loss == actual_loss)
 
     def test_cross_entropy_softmax_lost_with_bias(self):
@@ -123,5 +123,5 @@ class Tests(unittest.TestCase):
         b = np.array([1, 4])
 
         expected_loss = 4.667315445032424
-        actual_loss = forward.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
+        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
         self.assertTrue(expected_loss == actual_loss)

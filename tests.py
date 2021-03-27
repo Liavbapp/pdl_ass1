@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from numpy import linalg
 
-import forward
+import forward_old
 
 
 class GradTests(unittest.TestCase):
@@ -32,9 +32,9 @@ class GradTests(unittest.TestCase):
         d = d / linalg.norm(d)
         d_f = d.flatten()
 
-        Fw = lambda W: forward.cross_entropy_softmax_lost(X, C, W, b)
+        Fw = lambda W: forward_old.cross_entropy_softmax_lost(X, C, W, b)
         Fw_delta = lambda W, epsilon: Fw(W) + epsilon * np.matmul(d_f,
-                                                                  forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                  forward_old.compute_softmax_gradient_vector_respect_to_weights(
                                                                       X, W, C, b).flatten()) + epsilon ** 2
 
         res_sum1 = []
@@ -44,7 +44,7 @@ class GradTests(unittest.TestCase):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(W_0, epsi) - Fw(W_0))
             sum2 = abs(Fw_delta(W_0, epsi) - Fw(W_0) - epsi * np.matmul(d_f,
-                                                                        forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                        forward_old.compute_softmax_gradient_vector_respect_to_weights(
                                                                             X, W_0, C, b).flatten()))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
