@@ -1,3 +1,4 @@
+import random
 import time
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
@@ -57,52 +58,61 @@ def update_weights(X, Y, W_old):
     return W_new
 
 
-def compute_acc(X, Y, W, with_eta=False):
-    softmax_output = forward.softmax(X, Y, W, with_eta=with_eta)
-    soft_max_predictions = np.argmax(softmax_output, axis=1)
-    true_labels_predictions = np.argmax(Y, axis=1)
-    train_accuracy = np.sum(soft_max_predictions == true_labels_predictions) / X.shape[1]
-    return train_accuracy
+def compute_acc(X_samples, Y_samples, W, with_eta=False):
+    softmax_output = forward.softmax(X_samples, Y_samples, W, with_eta=with_eta)
+    softmax_predictions = np.argmax(softmax_output, axis=1)
+    true_labels_predictions = np.argmax(Y_samples, axis=0)
+    accuracy = np.sum(softmax_predictions == true_labels_predictions) / X_samples.shape[1]
+    return accuracy
 
 
-def plt_acc(train_acc_lst):
-    # TODO: add validation acc
-    df_acc = pd.DataFrame({'train_acc': train_acc_lst})
-    df_acc = pd.DataFrame({'train_acc': train_acc_lst})
-    # acc_val = df_acc.history['val_loss']
-    epochs = range(1, 35)
-    plt.plot(df_acc.index, df_acc['train_acc'], 'g', label='Training acc')
-    # plt.plot(epochs, loss_val, 'b', label='validation loss')
-    plt.title('Training and Validation loss')
+def plt_acc(df_train_accuracy, df_test_accuracy):
+    plt.plot(df_train_accuracy['epoch'], df_train_accuracy['acc'], 'g', label='training accuracy')
+    plt.plot(df_test_accuracy['epoch'], df_test_accuracy['acc'], 'b', label='validation accuracy')
+    plt.title('Training and Validation accuracy')
     plt.xlabel('Epochs')
-    plt.ylabel('Loss')
+    plt.ylabel('Accuracy')
     plt.legend()
     plt.show()
 
 
 def sgd_test():
     train_x, test_x, train_y, test_y = load_data(DataSets.swiss_roll)  # loading dataset
+    train_indices = random.sample(range(0, train_x.shape[1]), int(0.05 * train_x.shape[1]))
+    test_indices = random.sample(range(0, test_x.shape[1]), int(0.05 * test_x.shape[1]))
+    train_x_samples = train_x[:, train_indices]
+    train_y_samples = train_y[:, train_indices]
+    test_x_samples = test_x[:, test_indices]
+    test_y_samples = test_y[:, test_indices]
+
     num_features = train_x.shape[0]
     num_labels = train_y.shape[0]
     costs = []
-    train_acc_lst = []
-    test_acc = []
-    W_old = np.random.rand(num_features + 1, num_labels)
+
+    W_old = np.random.randn(num_labels, num_features + 1) * np.sqrt(2 / num_labels) # the +1 is for the bias neuron feature
+    acc_chunks_train = []
+    acc_chunks_test = []
 
     for epoch in range(0, HyperParams.num_epochs):
-        print(epoch)
+        if epoch % 1 == 0 and epoch > 0:
+            print(epoch)
+            train_accuracy = compute_acc(train_x_samples, train_y_samples, W_old)
+            test_accuracy = compute_acc(test_x_samples, test_y_samples, W_old)
+            acc_chunks_train.append(pd.DataFrame({'acc': train_accuracy, 'epoch': epoch}, index=[0]))
+            acc_chunks_test.append(pd.DataFrame({'acc': test_accuracy, 'epoch': epoch}, index=[0]))
+            print(f'train acc: {train_accuracy}')
+            print(f'test acc: {test_accuracy}')
+            cost = forward.cross_entropy_softmax_lost(X_batch, Y_batch, W_old) #TODO: compute lost of last batch only - fix this
+            # costs.append(cost)
+            print(f'cost: {cost}')
+
         train_data_batches, test_data_batches = pre_processing(train_x, test_x, train_y, test_y, HyperParams.batch_size)
-        train_acc_lst.append(
-            train_acc) if epoch > 0 else None  # TODO: it is only the last batch need to figureout what to do here
-        for batch_num in range(0, len(train_data_batches)):
-            X_batch, Y_batch = initiate_batch(train_data_batches, batch_num, num_features)
-            cost = forward.cross_entropy_softmax_lost(X_batch, Y_batch, W_old)
+        for batch_i in range(0, len(train_data_batches)):
+            X_batch, Y_batch = initiate_batch(train_data_batches, batch_i, num_features)
             W_new = update_weights(X_batch, Y_batch, W_old)
-            train_acc = compute_acc(X_batch, Y_batch, W_new, with_eta=False)
-            costs.append(cost)
             W_old = W_new
 
-    plt_acc(train_acc_lst)
+    plt_acc(pd.concat(acc_chunks_train), pd.concat(acc_chunks_test))
 
 
 sgd_test()

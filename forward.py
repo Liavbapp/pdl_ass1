@@ -5,7 +5,6 @@ def sgd_step(grads, W_old, lr):
     W_new = W_old - lr * grads
     return W_new
 
-
 def compute_softmax_gradient_vector_respect_to_weights(X, W, C):
     """
     :param X: data matrix - dimension: n x m
