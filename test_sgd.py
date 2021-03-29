@@ -1,12 +1,11 @@
 import random
-import time
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import numpy as np
 import pandas as pd
 import forward
 from Params import HyperParams, DataSets
-import plotly.express as px
+
 
 
 def load_data(data_set):
@@ -48,19 +47,18 @@ def pre_processing(train_x, test_x, train_y, test_y, batch_size):
 def initiate_batch(all_batches, batch_num, num_features):
     x_batch = all_batches[batch_num][0:num_features + 1, :]  # all the features rows including bias
     y_batch = all_batches[batch_num][num_features + 1:, :]  # the label rows
-    y_batch = y_batch.transpose()
     return x_batch, y_batch
 
 
-def update_weights(X, Y, W_old):
-    grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W_old, Y)
-    W_new = forward.sgd_step(grads, W_old, HyperParams.learning_rate)
+def update_weights(X,  W, Y):
+    grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W, Y)
+    W_new = forward.sgd_step(grads, W, HyperParams.learning_rate)
     return W_new
 
 
-def compute_acc(X_samples, Y_samples, W, with_eta=False):
-    softmax_output = forward.softmax(X_samples, Y_samples, W, with_eta=with_eta)
-    softmax_predictions = np.argmax(softmax_output, axis=1)
+def compute_acc(X_samples, W, Y_samples, with_eta=False):
+    softmax_output = forward.softmax(X_samples, W,  Y_samples, with_eta=with_eta)
+    softmax_predictions = np.argmax(softmax_output, axis=0)
     true_labels_predictions = np.argmax(Y_samples, axis=0)
     accuracy = np.sum(softmax_predictions == true_labels_predictions) / X_samples.shape[1]
     return accuracy
@@ -75,14 +73,15 @@ def plt_acc(df_train_accuracy, df_test_accuracy):
     plt.legend()
     plt.show()
 
-
 def sgd_test():
     train_x, test_x, train_y, test_y = load_data(DataSets.swiss_roll)  # loading dataset
     train_indices = random.sample(range(0, train_x.shape[1]), int(0.05 * train_x.shape[1]))
     test_indices = random.sample(range(0, test_x.shape[1]), int(0.05 * test_x.shape[1]))
     train_x_samples = train_x[:, train_indices]
+    train_x_samples = np.append(train_x_samples, np.ones((1, train_x_samples.shape[1])), axis=0)
     train_y_samples = train_y[:, train_indices]
     test_x_samples = test_x[:, test_indices]
+    test_x_samples = np.append(test_x_samples, np.ones((1, test_x_samples.shape[1])), axis=0)
     test_y_samples = test_y[:, test_indices]
 
     num_features = train_x.shape[0]
@@ -96,23 +95,24 @@ def sgd_test():
     for epoch in range(0, HyperParams.num_epochs):
         if epoch % 1 == 0 and epoch > 0:
             print(epoch)
-            train_accuracy = compute_acc(train_x_samples, train_y_samples, W_old)
-            test_accuracy = compute_acc(test_x_samples, test_y_samples, W_old)
+            train_accuracy = compute_acc(train_x_samples, W_old, train_y_samples)
+            test_accuracy = compute_acc(test_x_samples, W_old, test_y_samples)
             acc_chunks_train.append(pd.DataFrame({'acc': train_accuracy, 'epoch': epoch}, index=[0]))
             acc_chunks_test.append(pd.DataFrame({'acc': test_accuracy, 'epoch': epoch}, index=[0]))
             print(f'train acc: {train_accuracy}')
             print(f'test acc: {test_accuracy}')
-            cost = forward.cross_entropy_softmax_lost(X_batch, Y_batch, W_old) #TODO: compute lost of last batch only - fix this
+            cost = forward.cross_entropy_softmax_lost(X_batch, W_old, Y_batch) #TODO: compute lost of last batch only - fix this
             # costs.append(cost)
             print(f'cost: {cost}')
 
         train_data_batches, test_data_batches = pre_processing(train_x, test_x, train_y, test_y, HyperParams.batch_size)
         for batch_i in range(0, len(train_data_batches)):
             X_batch, Y_batch = initiate_batch(train_data_batches, batch_i, num_features)
-            W_new = update_weights(X_batch, Y_batch, W_old)
+            W_new = update_weights(X_batch, W_old, Y_batch)
             W_old = W_new
 
     plt_acc(pd.concat(acc_chunks_train), pd.concat(acc_chunks_test))
 
 
-sgd_test()
+if __name__ == '__main__':
+    sgd_test()

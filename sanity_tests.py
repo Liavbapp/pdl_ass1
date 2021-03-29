@@ -1,127 +1,47 @@
 import unittest
 import numpy as np
-
-import forward_old
-
-from forward_old import cross_entropy_softmax_lost
+import forward
 
 
 class Tests(unittest.TestCase):
 
-    def test_SGD_softmax(self):
-        X = np.array([[10, 5, 8],
-                      [11, 3, 2],
-                      [6, 1, 7]])  # n=3,  m=3
+    def test_softmax(self):
+        X = np.random.randn(5, 10)  # features=5,  m=10
 
-        C = np.array([[1, 0],
-                      [0, 1],
-                      [1, 0]])  # l=2, m=3
+        W = np.random.randn(2, 5)  # cur_layer=2, prev_layer=5
+        C = np.array([[1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
+                      [0, 1, 0, 0, 1, 1, 0, 1, 1, 0]])  # l=2, m=10
 
-        W = np.array([[1, 3],
-                        [2, 4],
-                        [4, 6]])  # n=3, l=2
-
-        b = np.array([0, 0])
-
-        forward_old.SGD_softmax(X, W, C, b, lr=1e-05)
+        softmax_res = forward.softmax(X, W, C)
+        self.assertTrue(softmax_res.shape[0] == 2 and softmax_res.shape[1] == 10)
+        np.testing.assert_allclose(softmax_res.sum(axis=0), np.ones(10))
 
     def test_compute_softmax_gradient_vector_respect_to_weights(self):
-        """
-        computation of lost function
-        :param X: data matrix - dimension: n x m
-        :param C: classes vector matrix - dimension: m x l
-        :param W: weights matrix - dimension: n x l
-        :param b: bias vector - length l
-        :param num_classes:
-        :return:
-        """
-        X = np.array([[10, 5, 8],
-                      [11, 3, 2],
-                      [6, 1, 7]])  # n=3,  m=3
+        X = np.random.rand(10, 4)  # features=10,  m=4
 
-        C = np.array([[1, 0],
-                      [0, 1],
-                      [1, 0]]) .transpose() # m=3, l=2
+        W = np.random.rand(3, 10)  # cur=3, prev=10
 
-        W = np.array([[1, 3],
-                      [2, 4],
-                      [4, 6]]) # n=3, l=2
+        C = np.array([[1, 0, 1, 0],
+                      [0, 1, 0, 0],
+                      [0, 0, 0, 1]])  # l=3, m=4
 
-        b = np.array([0, 0])
+        actual_grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W, C)
+        self.assertTrue(actual_grads.shape[0] == W.shape[0] and actual_grads.shape[1] == W.shape[1])
 
-        actual_grads = forward_old.compute_softmax_gradient_vector_respect_to_weights(X, W, C, b)
-        print(actual_grads)
+    def test_cross_entropy_softmax_lost(self):
+        X = np.array([[0.52818428, 0.04495849, 0.55422462, 0.8550578],
+                      [0.60724775, 0.3631421, 0.20652824, 0.95099002],
+                      [0.2413483, 0.72092741, 0.28588687, 0.76531959],
+                      [0.92140116, 0.26976411, 0.58529224, 0.21398077],
+                      [0.60856064, 0.01444655, 0.68838315, 0.78568933]])  # n=5, m=4
 
-    def test_cross_entropy_softmax_lost_no_eta(self):
-        """
-        computation of lost function
-        :param X: data matrix - dimension: n x m
-        :param C: classes vector matrix - dimension: l x m
-        :param W: weights matrix - dimension: n x l
-        :param num_classes:
-        :return:
-        """
-        X = np.array([[1, 2, 3],
-                      [3, 4, 4]])
+        W = np.array([[9.42584723e-01, 3.87141862e-01, 5.65437122e-04, 7.10752235e-01, 5.08893974e-01],
+                      [6.04889885e-01, 9.65193922e-01, 4.28946985e-01, 6.08191680e-01, 1.35084548e-01],
+                      [2.54619842e-01, 1.78962612e-01, 8.01471760e-01, 6.80141444e-01, 2.35958096e-01]])  # n=3 , n-1=5
 
-        C = np.array([[0, 1, 0],
-                      [1, 0, 1]]).transpose()
-
-        W = np.array([[1, 3],
-                      [5, 1]])
-
-        b = np.array([0, 0])
-
-        expected_loss = 6.666698980663971
-        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=False)
-        self.assertTrue(expected_loss == actual_loss)
-
-
-
-    def test_cross_entropy_softmax_lost_with_eta(self):
-        """
-        computation of lost function
-        :param X: data matrix - dimension: n x m
-        :param C: classes vector matrix - dimension: l x m
-        :param W: weights matrix - dimension: n x l
-        :param num_classes:
-        :return:
-        """
-        X = np.array([[1, 2, 3],
-                      [3, 4, 4]])
-
-        C = np.array([[0, 1, 0],
-                      [1, 0, 1]])
-
-        W = np.array([[1, 3],
-                      [5, 1]])
-
-        b = np.array([0, 0])
-
-        expected_loss = 6.666698980663971
-        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
-        self.assertTrue(expected_loss == actual_loss)
-
-    def test_cross_entropy_softmax_lost_with_bias(self):
-        """
-        computation of lost function
-        :param X: data matrix - dimension: n x m
-        :param C: classes vector matrix - dimension: l x m
-        :param W: weights matrix - dimension: n x l
-        :param num_classes:
-        :return:
-        """
-        X = np.array([[1, 2, 3],
-                      [3, 4, 4]])
-
-        C = np.array([[0, 1, 0],
-                      [1, 0, 1]])
-
-        W = np.array([[1, 3],
-                      [5, 1]])
-
-        b = np.array([1, 4])
-
-        expected_loss = 4.667315445032424
-        actual_loss = forward_old.cross_entropy_softmax_lost(X, C, W, b, with_eta=True)
-        self.assertTrue(expected_loss == actual_loss)
+        C = np.array([[0, 0, 1, 0],
+                      [1, 0, 0, 0],
+                      [0, 1, 0, 1]])  # l=3, m=4
+        expected_loss = 1.085366618369291
+        actual_loss = forward.cross_entropy_softmax_lost(X, W, C, with_eta=False)
+        np.testing.assert_allclose(expected_loss, actual_loss)
