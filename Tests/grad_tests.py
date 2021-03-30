@@ -3,7 +3,6 @@ import numpy as np
 import torch
 from numpy import linalg
 
-import forward_old
 
 
 class GradTests(unittest.TestCase):

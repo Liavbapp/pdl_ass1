@@ -1,7 +1,7 @@
 
 class HyperParams:
-    learning_rate = 1e-3
-    batch_size = 32
+    learning_rate = 0.001
+    batch_size = 16
     num_epochs = 100
 
     # batches_sizes = [2 ** i for i in range(0, 7)]

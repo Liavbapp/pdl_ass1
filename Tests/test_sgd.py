@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import numpy as np
 import pandas as pd
-import forward
-from Params import HyperParams, DataSets
+from Components import forward
+from Utils.Params import HyperParams, DataSets
 
 
 
@@ -57,7 +57,7 @@ def update_weights(X,  W, Y):
 
 
 def compute_acc(X_samples, W, Y_samples, with_eta=False):
-    softmax_output = forward.softmax(X_samples, W,  Y_samples, with_eta=with_eta)
+    softmax_output = forward.softmax(X_samples, W, Y_samples, with_eta=with_eta)
     softmax_predictions = np.argmax(softmax_output, axis=0)
     true_labels_predictions = np.argmax(Y_samples, axis=0)
     accuracy = np.sum(softmax_predictions == true_labels_predictions) / X_samples.shape[1]

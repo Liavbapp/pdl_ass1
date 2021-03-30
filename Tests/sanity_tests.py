@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-import forward
+from Components import forward
 
 
 class Tests(unittest.TestCase):
