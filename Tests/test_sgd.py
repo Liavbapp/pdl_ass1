@@ -9,7 +9,7 @@ from Utils.Params import HyperParams, DataSets
 
 
 def load_data(data_set):
-    data = loadmat(f'Data/{data_set}.mat')
+    data = loadmat(f'../Data/{data_set}.mat')
     train_x = data['Yt']
     test_x = data['Yv']
     train_y = data['Ct']
