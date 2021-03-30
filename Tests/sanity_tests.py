@@ -9,10 +9,8 @@ class Tests(unittest.TestCase):
         X = np.random.randn(5, 10)  # features=5,  m=10
 
         W = np.random.randn(2, 5)  # cur_layer=2, prev_layer=5
-        C = np.array([[1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
-                      [0, 1, 0, 0, 1, 1, 0, 1, 1, 0]])  # l=2, m=10
 
-        softmax_res = forward.softmax(X, W, C)
+        softmax_res = forward.softmax(X, W)
         self.assertTrue(softmax_res.shape[0] == 2 and softmax_res.shape[1] == 10)
         np.testing.assert_allclose(softmax_res.sum(axis=0), np.ones(10))
 
@@ -45,3 +43,11 @@ class Tests(unittest.TestCase):
         expected_loss = 1.085366618369291
         actual_loss = forward.cross_entropy_softmax_lost(X, W, C, with_eta=False)
         np.testing.assert_allclose(expected_loss, actual_loss)
+
+    def test_forward_pass_t1(self):
+        X = np.random.rand(5, 3)  # n=5, m=3
+        W = np.random.rand(2, 5)  # w1=2, w0=5
+        W_dict = {'W1': W}
+        A_L = forward.forward_pass(X, W_dict)
+        self.assertTrue(A_L.shape[0] == 2, A_L.shape[1] == 3)
+        np.testing.assert_allclose(np.sum(A_L, axis=0), np.ones(3))
