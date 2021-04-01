@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from numpy import linalg
 
-import forward
+from Components import forward
 
 
 class GradTests(unittest.TestCase):
@@ -24,8 +24,6 @@ class GradTests(unittest.TestCase):
         W_0 = np.array([[1, 3],
                         [2, 4],
                         [4, 6]])  # n=3, l=2
-
-        b = np.array([6, 5])
 
         d = np.random.rand(len(W_0), len(W_0[0]))
         d = d / linalg.norm(d)
