@@ -14,14 +14,17 @@ def forward_pass(X, W_dict):
     for layer_i in range(1, num_layers - 1):
         W_i = W_dict[layer_i]
         Z_i = np.matmul(W_i, A_i)
-        A_i = relu(Z_i)
+        A_i = tanh_func(Z_i)
 
     W_L = W_dict[f'W{num_layers}']
-    A_L = softmax(A_i, W_L)
+    Z_L = np.matmul(W_L, A_i)
+    A_L = softmax(Z_L)
     return A_L
 
-def relu(Z_i):
-    pass
+
+def tanh_func(Z_i):
+    return np.tanh(Z_i)
+
 
 def sgd_step(grads, W_old, lr):
     W_new = W_old - lr * grads
@@ -52,7 +55,7 @@ def compute_softmax_gradient_vector_respect_to_weights(A_L, W_L, C):
     # return grads
 
 
-def softmax(A_prev, W_L, with_eta=False):
+def softmax_old(A_prev, W_L, with_eta=False):
     """
      :param A_prev: Activation of previous layer - dimension: num_features_prev_layer x m
      :param W_L: weights matrix - dimension: n (neuron current layer) x n-1 (neuron prev layer)
@@ -65,6 +68,22 @@ def softmax(A_prev, W_L, with_eta=False):
     softmax_denominator = sum([np.exp(np.matmul(Z_L_t, W_L[k]) - eta_lst) for k in range(0, num_labels)])
     softmax_res = np.array([np.exp(np.matmul(Z_L_t, W_L[k]) - eta_lst) / softmax_denominator for k in range(0, num_labels)])
     return softmax_res
+
+
+def softmax(Z):
+    """
+    :param Z: the linear component of the activation function
+    :return A: the activations of the layer
+    :return activation_cache: returns Z, which will be useful for the backpropagation
+    """
+    exp = np.exp(Z)
+    A = exp / np.sum(exp, axis=0)[None, :]
+    return A, {'Z': Z}
+
+
+def safe_softmax(Z):
+    Z_safe = Z - Z.max(axis=0)
+    return softmax(Z_safe)[0], {'Z': Z}
 
 
 def cross_entropy_softmax_lost(Z_L, W_L, C, with_eta=False):

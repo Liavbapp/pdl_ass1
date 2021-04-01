@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from numpy import linalg
 
-from Components import forward
+import Components.forward as forward
 
 
 class GradTests(unittest.TestCase):
@@ -10,26 +10,26 @@ class GradTests(unittest.TestCase):
     def test_grad(self):
         """
         :param X: data matrix - dimension: n x m
-        :param W: weights matrix - dimension: n x l
+        :param W: weights matrix - dimension: current_layer_features x prev_layer_features
         :param C: classes vector matrix - dimension: l x m
         :param b: bias vector - length: l"""
-        X = np.array([[10, 5, 8],
-                      [11, 3, 2],
-                      [6, 1, 7]])  # n=3,  m=3
+        X = np.array([[10, 5, 8, 6],
+                      [11, 3, 2, 5],
+                      [6, 1, 7, 4]])  # n=3,  m=4
 
-        C = np.array([[1, 0],
-                      [0, 1],
-                      [1, 0]])  # l=2, m=3
+        C = np.array([[1, 0, 0, 1],
+                      [0, 1, 1, 0]])  # l=2, m=4
 
-        W_0 = np.array([[1, 3],
-                        [2, 4],
-                        [4, 6]])  # n=3, l=2
+        W_0 = np.array([[1, 3, 4],
+                        [2, 4, 6]])  # n=2, l=3
+
+        b = np.array([6, 5])
 
         d = np.random.rand(len(W_0), len(W_0[0]))
         d = d / linalg.norm(d)
         d_f = d.flatten()
 
-        Fw = lambda W: forward.cross_entropy_softmax_lost(X, C, W)
+        Fw = lambda W: forward.cross_entropy_softmax_lost(X, W, C)
         Fw_delta = lambda W, epsilon: Fw(W) + epsilon * np.matmul(d_f,
                                                                   forward.compute_softmax_gradient_vector_respect_to_weights(
                                                                       X, W, C).flatten()) + epsilon ** 2
@@ -57,7 +57,7 @@ class GradTests(unittest.TestCase):
         :param with_eta: use eta for safety
         :param X: data matrix - dimension: n x m
         :param C: classes vector matrix - dimension: l x m
-        :param W: weights matrix - dimension: n x l
+        :param W: weights matrix - dimension: current_layer_features x prev_layer_features
         :param b: bias vector - length: l
         :param num_classes:
         :return:
