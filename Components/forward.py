@@ -11,10 +11,10 @@ def forward_pass(X, W_dict):
     """
     num_layers = len(W_dict)
     A_i = X
-    for layer_i in range(1, num_layers - 1):
-        W_i = W_dict[layer_i]
+    for layer_i in range(1, num_layers):
+        W_i = W_dict[f'W{layer_i}']
         Z_i = np.matmul(W_i, A_i)
-        A_i = tanh_func(Z_i)
+        A_i = relu_func(Z_i)
 
     W_L = W_dict[f'W{num_layers}']
     Z_L = np.matmul(W_L, A_i)
@@ -26,48 +26,19 @@ def tanh_func(Z_i):
     return np.tanh(Z_i)
 
 
+def relu_func(Z):
+    def relu(zi):
+        return np.maximum(0., zi)
+
+    relu_func = np.vectorize(relu)
+    A = relu_func(Z)
+    return A
+
+
 def sgd_step(grads, W_old, lr):
     W_new = W_old - lr * grads
     return W_new
 
-
-def compute_softmax_gradient_vector_respect_to_weights(A_L, W_L, C):
-    """
-    :param A_L: activation of last layer - dimension: n (num features) x m (num samples)
-    :param W_L: weights matrix - dimension: n (neuron current layer) x l (neuron prev layer)
-    :param C: classes vector matrix - dimension: l (num labels) x m (num samples)
-    :return grads:  gradient with respect to 'W' (same shape as W)
-    """
-    m = A_L.shape[1]
-    num_labels = C.shape[0]
-    X_t = np.transpose(A_L)
-    denominator = sum([np.exp(np.matmul(X_t, W_L[k])) for k in range(0, num_labels)])
-    grads = np.array([(1 / m) * np.matmul(A_L, (np.exp(np.matmul(X_t, W_L[p])) / denominator) - C[p]) for p in
-                      range(0, num_labels)])
-    return grads
-
-    # grads = []
-    # for p in range(0, l):
-    #     C_p = C[p]
-    #     nominator = np.exp(np.matmul(X_t, W[:, p]))
-    #     grads.append((1 / m) * np.matmul(X, (nominator / denominator) - C_p))
-    # grads = np.array(grads).transpose()
-    # return grads
-
-
-def softmax_old(A_prev, W_L, with_eta=False):
-    """
-     :param A_prev: Activation of previous layer - dimension: num_features_prev_layer x m
-     :param W_L: weights matrix - dimension: n (neuron current layer) x n-1 (neuron prev layer)
-     :return softmax_res: dimensions: n (num features) x m (num samples)
-     """
-    Z_L_t = A_prev.T
-    m = A_prev.shape[1]
-    num_labels = W_L.shape[0]
-    eta_lst = [max([np.matmul(Z_L_t[i], W_L[k]) for k in range(0, num_labels)]) for i in range(0, m)] if with_eta else [0] * m
-    softmax_denominator = sum([np.exp(np.matmul(Z_L_t, W_L[k]) - eta_lst) for k in range(0, num_labels)])
-    softmax_res = np.array([np.exp(np.matmul(Z_L_t, W_L[k]) - eta_lst) / softmax_denominator for k in range(0, num_labels)])
-    return softmax_res
 
 
 def softmax(Z):
@@ -78,12 +49,12 @@ def softmax(Z):
     """
     exp = np.exp(Z)
     A = exp / np.sum(exp, axis=0)[None, :]
-    return A, {'Z': Z}
+    return A
 
 
 def safe_softmax(Z):
     Z_safe = Z - Z.max(axis=0)
-    return softmax(Z_safe)[0], {'Z': Z}
+    return softmax(Z_safe)
 
 
 def cross_entropy_softmax_lost(Z_L, W_L, C, with_eta=False):
