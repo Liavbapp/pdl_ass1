@@ -10,7 +10,7 @@ class GradTests(unittest.TestCase):
     def test_grad(self):
         """
         :param X: data matrix - dimension: n x m
-        :param W: weights matrix - dimension: n x l
+        :param W: weights matrix - dimension: current_layer_features x prev_layer_features
         :param C: classes vector matrix - dimension: l x m
         :param b: bias vector - length: l"""
         X = np.array([[10, 5, 8, 6],
@@ -57,7 +57,7 @@ class GradTests(unittest.TestCase):
         :param with_eta: use eta for safety
         :param X: data matrix - dimension: n x m
         :param C: classes vector matrix - dimension: l x m
-        :param W: weights matrix - dimension: n x l
+        :param W: weights matrix - dimension: current_layer_features x prev_layer_features
         :param b: bias vector - length: l
         :param num_classes:
         :return:
