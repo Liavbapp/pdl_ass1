@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import torch
 from numpy import linalg
-
+from Components import forward
 
 
 class GradTests(unittest.TestCase):
@@ -10,31 +10,27 @@ class GradTests(unittest.TestCase):
     def test_grad(self):
         """
         :param X: data matrix - dimension: n x m
-        :param W: weights matrix - dimension: n x l
+        :param W: weights matrix - dimension: num features current layer x num features prev layer
         :param C: classes vector matrix - dimension: l x m
         :param b: bias vector - length: l"""
-        X = np.array([[10, 5, 8],
-                      [11, 3, 2],
-                      [6, 1, 7]])  # n=3,  m=3
+        X = np.array([[10, 5, 8, 6],
+                      [11, 3, 2, 7],
+                      [6, 1, 7, 9]])  # n=3,  m=4
 
-        C = np.array([[1, 0],
-                      [0, 1],
-                      [1, 0]])  # l=2, m=3
+        C = np.array([[1, 0, 1, 1],
+                      [0, 1, 0, 0]])  # l=2, m=4
 
-        W_0 = np.array([[1, 3],
-                        [2, 4],
-                        [4, 6]])  # n=3, l=2
-
-        b = np.array([6, 5])
+        W_0 = np.array([[1, 3, 7],
+                        [4, 6, 8]])  # n=3, l=2
 
         d = np.random.rand(len(W_0), len(W_0[0]))
         d = d / linalg.norm(d)
         d_f = d.flatten()
 
-        Fw = lambda W: forward_old.cross_entropy_softmax_lost(X, C, W, b)
+        Fw = lambda W: forward.cross_entropy_softmax_lost(X, W, C)
         Fw_delta = lambda W, epsilon: Fw(W) + epsilon * np.matmul(d_f,
-                                                                  forward_old.compute_softmax_gradient_vector_respect_to_weights(
-                                                                      X, W, C, b).flatten()) + epsilon ** 2
+                                                                  forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                      X, W, C).flatten()) + epsilon ** 2
 
         res_sum1 = []
         res_sum2 = []
@@ -43,8 +39,8 @@ class GradTests(unittest.TestCase):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(W_0, epsi) - Fw(W_0))
             sum2 = abs(Fw_delta(W_0, epsi) - Fw(W_0) - epsi * np.matmul(d_f,
-                                                                        forward_old.compute_softmax_gradient_vector_respect_to_weights(
-                                                                            X, W_0, C, b).flatten()))
+                                                                        forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                            X, W_0, C).flatten()))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
 
