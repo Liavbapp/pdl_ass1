@@ -6,13 +6,18 @@ from Components import forward
 class Tests(unittest.TestCase):
 
     def test_softmax(self):
-        X = np.random.randn(5, 10)  # features=5,  m=10
+        A_L = np.random.randn(5, 10)  # features=5,  m=10
 
-        W = np.random.randn(2, 5)  # cur_layer=2, prev_layer=5
+        softmax_res = forward.softmax(A_L)
+        self.assertTrue(softmax_res.shape == A_L.shape)
+        np.testing.assert_allclose(softmax_res.sum(axis=0), np.ones(A_L.shape[1]))
 
-        softmax_res = forward.softmax(X, W)
-        self.assertTrue(softmax_res.shape[0] == 2 and softmax_res.shape[1] == 10)
-        np.testing.assert_allclose(softmax_res.sum(axis=0), np.ones(10))
+    def test_safe_softmax(self):
+        A_L = np.random.randn(5, 10)  # features=5,  m=10
+
+        softmax_res = forward.safe_softmax(A_L)
+        self.assertTrue(softmax_res.shape == A_L.shape)
+        np.testing.assert_allclose(softmax_res.sum(axis=0), np.ones(A_L.shape[1]))
 
     def test_compute_softmax_gradient_vector_respect_to_weights(self):
         X = np.random.rand(10, 4)  # features=10,  m=4
@@ -50,4 +55,49 @@ class Tests(unittest.TestCase):
         W_dict = {'W1': W}
         A_L = forward.forward_pass(X, W_dict)
         self.assertTrue(A_L.shape[0] == 2, A_L.shape[1] == 3)
+        np.testing.assert_allclose(np.sum(A_L, axis=0), np.ones(3))
+
+    def test_forward_pass_t2(self):
+        X = np.random.rand(5, 3)  # n=5, m=3
+        print("X: ", X)
+        W_1 = np.random.rand(2, 5)  # w1=2, w0=5
+        print("W_1: ", W_1)
+        W_2 = np.random.rand(4, 2)
+        print("W_2: ", W_2)
+        W_3 = np.random.rand(3, 4)
+        print("W_3: ", W_3)
+        W_dict = {'W1': W_1, 'W2': W_2, 'W3': W_3}
+        A_L = forward.forward_pass(X, W_dict)
+        print("A_L: ", A_L)
+        self.assertTrue(A_L.shape[0] == 3, A_L.shape[1] == 3)
+        np.testing.assert_allclose(np.sum(A_L, axis=0), np.ones(3))
+
+    def test_forward_pass_t3(self):
+        X = np.array([[0.23174121, 0.7610559, 0.49483376],
+                      [0.36007492, 0.71299414, 0.41246607],
+                      [0.90198136, 0.88417988, 0.47496868],
+                      [0.54249147, 0.51142508, 0.34182941],
+                      [0.79066538, 0.46137318, 0.94054406]])  # 5x3
+
+        W_1 = np.array([[0.77145011, 0.68625424, 0.50337483, 0.86385026, 0.0135212],
+                        [0.001316, 0.44814127, 0.41160443, 0.31282115, 0.52893298]])  # 2x5
+
+        W_2 = np.array([[0.22006386, 0.91695532],
+                        [0.93700986, 0.2066702],
+                        [0.80240503, 0.16421343],
+                        [0.81019019, 0.43283506]])  # 4x2
+
+        W_3 = np.array([[0.59773755, 0.18292451, 0.54529299, 0.36539322],
+                        [0.55707105, 0.02494888, 0.06766612, 0.39275127],
+                        [0.28398953, 0.27095607, 0.27950803, 0.04073363]])  # 3x4
+
+        W_dict = {'W1': W_1, 'W2': W_2, 'W3': W_3}
+        A_L = forward.forward_pass(X, W_dict)
+
+        expected_A_L = np.array([[0.57308885, 0.64268965, 0.54599659],
+                                 [0.2431913, 0.199682, 0.25474035],
+                                 [0.18371985, 0.15762834, 0.19926306]])
+
+        self.assertTrue(A_L.shape[0] == 3, A_L.shape[1] == 3)
+        np.testing.assert_allclose(A_L, expected_A_L)
         np.testing.assert_allclose(np.sum(A_L, axis=0), np.ones(3))
