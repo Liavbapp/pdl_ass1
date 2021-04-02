@@ -1,5 +1,7 @@
 import numpy as np
 
+from Components import forward
+
 
 def initiate_wb_dict(layer_dims):
     """
@@ -11,3 +13,10 @@ def initiate_wb_dict(layer_dims):
     params.update({f'b{i + 1}': np.zeros((layer_dims[i + 1], 1)) for i in range(len(layer_dims) - 1)})
 
     return params
+
+
+def compute_acc(prediction, Y_samples):
+    softmax_predictions = np.argmax(prediction, axis=0)
+    true_labels_predictions = np.argmax(Y_samples, axis=0)
+    accuracy = np.sum(softmax_predictions == true_labels_predictions) / prediction.shape[1]
+    return accuracy

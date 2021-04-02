@@ -3,23 +3,14 @@ import numpy as np
 from Components import sgd
 
 
-def update_wb(grads_dict, WB_dict, lr):
-    num_layers = len(WB_dict.keys())
-    for i in range(num_layers, 0, -1):
-        WB_dict[f'W{i}'] = sgd.sgd_step(grads_dict[f'grads{i}'][0], WB_dict[f'W{i}'], lr)
-        WB_dict[f'b{i}'] = sgd.sgd_step(grads_dict[f'grads{i}'][1], WB_dict[f'b{i}'], lr)
-
-    return WB_dict
-
-
 def backward_pass(A_L, WB_dict, A_dict, C):
-    num_layers = len(WB_dict.keys())
+    num_layers = len(WB_dict.keys()) // 2
     grads_dict = {}
     grad_w, grad_x, grad_b = backward_softmax(C, WB_dict[f'W{num_layers}'], A_dict[f'A{num_layers - 1}'])
-    grads_dict.update({f'grads{num_layers}': (grad_w, grad_x, grad_b)})
+    grads_dict.update({f'grads{num_layers}': {"grad_w": grad_w, "grad_x": grad_x, "grad_b": grad_b}})
     for i in range(num_layers - 1, 0, -1):
         grad_w, grad_x, grad_b = backward_linear(WB_dict[f'W{i}'], A_dict[f'A{i - 1}'], grad_x, WB_dict[f'b{i}'])
-        grads_dict.update({f'grads{i}': (grad_w, grad_x, grad_b)})
+        grads_dict.update({f'grads{i}': {"grad_w": grad_w, "grad_x": grad_x, "grad_b": grad_b}})
 
     return grads_dict
 
@@ -27,7 +18,7 @@ def backward_pass(A_L, WB_dict, A_dict, C):
 def backward_softmax(C, W, A_prev):
     grad_w = compute_softmax_gradient_vector_respect_to_weights(A_prev, W, C)
     grad_x = compute_softmax_gradient_vector_respect_to_data(A_prev, W, C)
-    return grad_w, grad_x, None
+    return grad_w, grad_x, np.zeros((W.shape[0], 1))
 
 
 def backward_linear(W, A_prev, dx, b=None):
