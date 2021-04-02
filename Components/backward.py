@@ -1,25 +1,40 @@
 import numpy as np
 
+from Components import sgd
 
-def backward_pass(A_L, W_dict, A_dict, C):
-    num_layers = len(W_dict.keys())
-    grad_w, grad_x = backward_softmax(C, W_dict[f'W{num_layers}'], A_dict[f'A{num_layers - 1}'])
+
+def update_wb(grads_dict, WB_dict, lr):
+    num_layers = len(WB_dict.keys())
+    for i in range(num_layers, 0, -1):
+        WB_dict[f'W{i}'] = sgd.sgd_step(grads_dict[f'grads{i}'][0], WB_dict[f'W{i}'], lr)
+        WB_dict[f'b{i}'] = sgd.sgd_step(grads_dict[f'grads{i}'][1], WB_dict[f'b{i}'], lr)
+
+    return WB_dict
+
+
+def backward_pass(A_L, WB_dict, A_dict, C):
+    num_layers = len(WB_dict.keys())
+    grads_dict = {}
+    grad_w, grad_x, grad_b = backward_softmax(C, WB_dict[f'W{num_layers}'], A_dict[f'A{num_layers - 1}'])
+    grads_dict.update({f'grads{num_layers}': (grad_w, grad_x, grad_b)})
     for i in range(num_layers - 1, 0, -1):
-        grad_w, grad_x = backward_linear(W_dict[f'W{i}'], A_dict[f'A{i - 1}'], grad_x, W_dict[f'b{i}'])
+        grad_w, grad_x, grad_b = backward_linear(WB_dict[f'W{i}'], A_dict[f'A{i - 1}'], grad_x, WB_dict[f'b{i}'])
+        grads_dict.update({f'grads{i}': (grad_w, grad_x, grad_b)})
 
-    # TODO: update the network...
+    return grads_dict
 
 
 def backward_softmax(C, W, A_prev):
     grad_w = compute_softmax_gradient_vector_respect_to_weights(A_prev, W, C)
     grad_x = compute_softmax_gradient_vector_respect_to_data(A_prev, W, C)
-    return grad_w, grad_x
+    return grad_w, grad_x, None
 
 
 def backward_linear(W, A_prev, dx, b=None):
     grad_x = jacobianTMV_grad_x(A_prev, W, dx, b)
     grad_w = jacobianTMV_grad_w(A_prev, W, dx, b)
-    return grad_w, grad_x
+    grad_b = jacobianTMV_grad_b(A_prev, W, dx, b)
+    return grad_w, grad_x, grad_b
 
 
 def compute_softmax_gradient_vector_respect_to_weights(A_prev, W_L, C):
@@ -59,32 +74,47 @@ def compute_softmax_gradient_vector_respect_to_data(A_pev, W, C):
 
 
 # p 16 (w.r.t w)
-def jacobianTMV_grad_w(X, W, v, b):
+def jacobianTMV_grad_b(x, W, v, b):
     """
-
-    :param X:
+    :param x:
     :param W:
     :param v:  we think it is dx
     :param b:
     :return:
     """
-    wx_b = np.matmul(W, X) + b
-    tanh_derv = derv_tanh(wx_b)
-    pair_wise_mult = np.multiply(tanh_derv, v)
-    jac_res = np.matmul(pair_wise_mult, X.T)
+    wx_b = np.matmul(W, x) + b  # w * x + b
+    tanh_derv = derv_tanh(wx_b)  # tanh'(w*x +b)
+    pair_wise_mult = np.multiply(tanh_derv, v)  # tanh_derv * v
+    return pair_wise_mult
+
+
+# p 16 (w.r.t w)
+def jacobianTMV_grad_w(x, W, v, b):
+    """
+
+    :param x:
+    :param W:
+    :param v:  we think it is dx
+    :param b:
+    :return:
+    """
+    wx_b = np.matmul(W, x) + b  # w * X + b
+    tanh_derv = derv_tanh(wx_b)  # tanh'(w*x +b)
+    pair_wise_mult = np.multiply(tanh_derv, v)  # tanh_derv * v
+    jac_res = np.matmul(pair_wise_mult, x.T)
     return jac_res
 
 
 # p 16 (w.r.t x)
-def jacobianTMV_grad_x(X, W, v, b):
+def jacobianTMV_grad_x(x, W, v, b):
     """
-    :param X:
+    :param x:
     :param W:
     :param v: we think it is dx
     :param b:
     :return:
     """
-    wx_b = np.matmul(W, X) + b
+    wx_b = np.matmul(W, x) + b
     tanh_derv = derv_tanh(wx_b)
     pair_wise_mult = np.multiply(tanh_derv, v)
     jac_res = np.matmul(W.T, pair_wise_mult)

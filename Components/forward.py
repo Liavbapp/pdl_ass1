@@ -38,12 +38,6 @@ def relu_func(Z):
     return A
 
 
-def sgd_step(grads, W_old, lr):
-    W_new = W_old - lr * grads
-    return W_new
-
-
-
 def softmax(Z):
     """
     :param Z: the linear component of the activation function
