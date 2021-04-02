@@ -1,25 +1,25 @@
 import numpy as np
 
 
-def forward_pass(X, W_dict):
+def forward_pass(X, wb_dict):
     """
     compute forward pass of the network
     :param X: Input Data - dimension: n (num features) x m (num samples)
-    :param W_dict: dictionary with Weights for each layer of the network
+    :param wb_dict: dictionary with Weights and biases for each layer of the network
     :param C: the true labels (or the class which it actually belongs)  dimension: l (num labels) x m (num samples)
     :return:
     """
-    num_layers = len(W_dict)
+    num_layers = len(wb_dict) // 2
     A_i = X
     A_dict = {f'A{0}': A_i}
     for layer_i in range(1, num_layers):
-        W_i = W_dict[f'W{layer_i}']
-        Z_i = np.matmul(W_i, A_i)
+        W_i = wb_dict[f'W{layer_i}']
+        Z_i = np.matmul(W_i, A_i) + wb_dict[f'b{layer_i}']
         A_i = relu_func(Z_i)
         A_dict.update({f'A{layer_i}': A_i})
 
-    W_L = W_dict[f'W{num_layers}']
-    Z_L = np.matmul(W_L, A_i)
+    W_L = wb_dict[f'W{num_layers}']
+    Z_L = np.matmul(W_L, A_i)  # TODO: add bias here??
     A_L = softmax(Z_L)
     A_dict.update({f'A{num_layers}': A_L})
     return A_L, A_dict
