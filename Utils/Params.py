@@ -1,6 +1,6 @@
 
 class HyperParams:
-    learning_rate = 0.01
+    learning_rate = 0.001
     batch_size = 32
     num_epochs = 50
 

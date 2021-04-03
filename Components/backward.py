@@ -21,10 +21,15 @@ def backward_softmax(C, W, A_prev):
     return grad_w, grad_x, np.zeros((W.shape[0], 1))
 
 
+
 def backward_linear(WB, A_prev, Z_cur, dx, b=None):
     grad_x = jacobianTMV_grad_x(Z_cur, WB, dx)
     grad_w = jacobianTMV_grad_w(A_prev, Z_cur, dx)
     grad_b = jacobianTMV_grad_b(Z_cur, dx)
+    # grad_w = (1 / grad_w.shape[1]) * grad_w
+    grad_b = (1 / grad_b.shape[1]) * np.sum(grad_b, axis=1)
+    grad_b = grad_b.reshape(-1, 1)
+
     return grad_w, grad_x, grad_b
 
 

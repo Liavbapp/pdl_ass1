@@ -2,6 +2,7 @@ from scipy.io import loadmat
 import numpy as np
 
 
+
 def load_data(data_set):
     data = loadmat(f'../Data/{data_set}.mat')
     train_x = data['Yt']
