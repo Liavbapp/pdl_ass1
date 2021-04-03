@@ -16,8 +16,8 @@ def load_data(data_set):
 def shuffle_data(train_x, test_x, train_y, test_y):
     train_data = np.concatenate([train_x, train_y])
     test_data = np.concatenate([test_x, test_y])
-    # np.random.shuffle(np.transpose(train_data))
-    # np.random.shuffle(np.transpose(test_data))
+    np.random.shuffle(np.transpose(train_data)) #todo: uncomment
+    np.random.shuffle(np.transpose(test_data)) #todo: uncomment
     return train_data, test_data
 
 
