@@ -5,19 +5,22 @@ import numpy as np
 import pandas as pd
 from Utils import data_handler
 from Components import forward
+from Components import backward
+from Components import sgd
 from Utils.Params import HyperParams, DataSets
 
 
 
 
 def update_weights(X, W, Y):
-    grads = forward.compute_softmax_gradient_vector_respect_to_weights(X, W, Y)
-    W_new = forward.sgd_step(grads, W, HyperParams.learning_rate)
+    grads = backward.compute_softmax_gradient_vector_respect_to_weights(X, W, Y)
+    W_new = sgd.sgd_step(grads, W, HyperParams.learning_rate)
     return W_new
 
 
-def compute_acc(X_samples, W, Y_samples, with_eta=False):
-    softmax_output = forward.softmax(X_samples, W, Y_samples, with_eta=with_eta)
+def compute_acc(X_samples, W, Y_samples):
+    Z = np.matmul(W, X_samples)
+    softmax_output = forward.softmax(Z)
     softmax_predictions = np.argmax(softmax_output, axis=0)
     true_labels_predictions = np.argmax(Y_samples, axis=0)
     accuracy = np.sum(softmax_predictions == true_labels_predictions) / X_samples.shape[1]
@@ -63,8 +66,7 @@ def sgd_test():
             acc_chunks_test.append(pd.DataFrame({'acc': test_accuracy, 'epoch': epoch}, index=[0]))
             print(f'train acc: {train_accuracy}')
             print(f'test acc: {test_accuracy}')
-            cost = forward.cross_entropy_softmax_lost(X_batch, W_old,
-                                                      Y_batch)  # TODO: compute lost of last batch only - fix this
+            cost = forward.cross_entropy_softmax_lost(A_prev=X_batch, W_L=W_old, C=Y_batch)  # TODO: compute lost of last batch only - fix this
             # costs.append(cost)
             print(f'cost: {cost}')
 
