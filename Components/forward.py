@@ -15,7 +15,7 @@ def forward_pass(X, wb_dict):
     for layer_i in range(1, num_layers):
         W_i = wb_dict[f'W{layer_i}']
         Z_i = np.matmul(W_i, A_i) + wb_dict[f'b{layer_i}']
-        A_i = relu_func(Z_i)
+        A_i = tanh_func(Z_i)
         AZ_dict.update({f'A{layer_i}': A_i, f'Z{layer_i}': Z_i})
 
     W_L = wb_dict[f'W{num_layers}']

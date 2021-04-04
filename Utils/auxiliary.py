@@ -10,7 +10,7 @@ def initiate_wb_dict(layer_dims):
     """
     params = {f'W{i + 1}': np.random.randn(layer_dims[i + 1], layer_dims[i]) * np.sqrt(2 / layer_dims[i]) for i in
               range(len(layer_dims) - 1)}
-    params.update({f'b{i + 1}': np.zeros((layer_dims[i + 1], 1)) for i in range(len(layer_dims) - 1)})
+    params.update({f'b{i + 1}': np.random.randn(layer_dims[i + 1], 1) for i in range(len(layer_dims) - 1)})
 
     return params
 
