@@ -2,7 +2,6 @@ from scipy.io import loadmat
 import numpy as np
 
 
-
 def load_data(data_set):
     data = loadmat(f'../Data/{data_set}.mat')
     train_x = data['Yt']
@@ -37,8 +36,9 @@ def add_bias_neuron(train_x, test_x):
 
 
 def pre_processing(train_x, test_x, train_y, test_y, batch_size):
+    m = train_x.shape[1]
     train_data_shf, test_data_shf = shuffle_data(train_x, test_x, train_y, test_y)
-    train_data_batches = np.array_split(train_data_shf, indices_or_sections=batch_size, axis=1)
-    test_data_batches = np.array_split(test_data_shf, indices_or_sections=batch_size, axis=1)
+    train_data_batches = np.array_split(train_data_shf, indices_or_sections=m // batch_size, axis=1)
+    test_data_batches = np.array_split(test_data_shf, indices_or_sections=m // batch_size, axis=1)
     # train_x_shf, train_y_shf = tuple(train_data_split)
     return train_data_batches, test_data_batches

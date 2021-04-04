@@ -27,7 +27,7 @@ def backward_linear(WB, A_prev, Z_cur, dx, b=None):
     grad_x = jacobianTMV_grad_x(Z_cur, WB, dx)
     grad_w = jacobianTMV_grad_w(A_prev, Z_cur, dx)
     grad_b = jacobianTMV_grad_b(Z_cur, dx)
-    grad_w = (1 / m) * grad_w
+    # grad_w = grad_w * (1/m)
     grad_b = (1 / m) * np.sum(grad_b, axis=1)
     grad_b = grad_b.reshape(-1, 1)
 

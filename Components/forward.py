@@ -59,7 +59,7 @@ def cross_entropy_softmax_lost(A_prev, W_L, C, with_eta=False):
     computation of lost function
     :param with_eta: use eta for safety
     :param A_prev: Z values of last layer - dimension: n (num features) x m (num samples)
-    :param W_L: weights matrix - dimension: n (neuron current layer) x l (neuron prev layer)
+    :param W_L: weights matrix - dimension: num_neurons_cur x num_neurons_prev
     :param C: classes vector matrix - dimension: l (num labels) x m (num samples)
     :return loss: dimensions: scalar
     """
