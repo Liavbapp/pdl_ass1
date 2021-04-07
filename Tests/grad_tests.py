@@ -32,7 +32,7 @@ class GradTests(unittest.TestCase):
 
         Fw = lambda W: forward.cross_entropy_softmax_lost(X, W, C)
         Fw_delta = lambda W, epsilon: Fw(W) + epsilon * np.matmul(d_f,
-                                                                  forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                  backward.compute_softmax_gradient_vector_respect_to_weights(
                                                                       X, W, C).flatten()) + epsilon ** 2
 
         res_sum1 = []
@@ -42,7 +42,7 @@ class GradTests(unittest.TestCase):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(W_0, epsi) - Fw(W_0))
             sum2 = abs(Fw_delta(W_0, epsi) - Fw(W_0) - epsi * np.matmul(d_f,
-                                                                        forward.compute_softmax_gradient_vector_respect_to_weights(
+                                                                        backward.compute_softmax_gradient_vector_respect_to_weights(
                                                                             X, W_0, C).flatten()))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
