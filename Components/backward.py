@@ -16,7 +16,7 @@ def backward_pass(A_L, WB_dict, AZ_dict, C):
 
 
 def backward_softmax(C, W, A_prev):
-    grad_w = compute_softmax_gradient_vector_respect_to_weights(A_prev, W, C)
+    grad_w = softmax_grad_wrt_weights(A_prev, W, C)
     grad_x = compute_softmax_gradient_vector_respect_to_data(A_prev, W, C)
     return grad_w, grad_x, np.zeros((W.shape[0], 1))
 
@@ -24,7 +24,7 @@ def backward_softmax(C, W, A_prev):
 
 def backward_linear(WB, A_prev, Z_cur, dx, b=None):
     m = A_prev.shape[1]
-    grad_x = jacobianTMV_grad_x(Z_cur, WB, dx)
+    grad_x = jacT_wrt_x(Z_cur, WB, dx)
     grad_w = jacobianTMV_grad_w(A_prev, Z_cur, dx)
     grad_b = jacobianTMV_grad_b(Z_cur, dx)
     grad_b = (1 / m) * np.sum(grad_b, axis=1)
@@ -33,7 +33,7 @@ def backward_linear(WB, A_prev, Z_cur, dx, b=None):
     return grad_w, grad_x, grad_b
 
 
-def compute_softmax_gradient_vector_respect_to_weights(A_prev, W_L, C):
+def softmax_grad_wrt_weights(A_prev, W_L, C):
     """
     :param A_prev: activation of last layer - dimension: n (num features) x m (num samples)
     :param W_L: weights matrix - dimension: n (neuron current layer) x l (neuron prev layer)
@@ -104,7 +104,7 @@ def jacobianTMV_grad_w(a_prev, z, v):
 
 
 # p 16 (w.r.t x)
-def jacobianTMV_grad_x(z, W, v):
+def jacT_wrt_x(z, W, v):
     """
     :param a_prev:
     :param W:

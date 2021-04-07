@@ -13,7 +13,7 @@ from Utils.Params import HyperParams, DataSets
 
 
 def update_weights(X, W, Y):
-    grads = backward.compute_softmax_gradient_vector_respect_to_weights(X, W, Y)
+    grads = backward.softmax_grad_wrt_weights(X, W, Y)
     W_new = sgd.sgd_step(grads, W, HyperParams.learning_rate)
     return W_new
 

@@ -74,7 +74,7 @@ class Tests(unittest.TestCase):
                        2.52068948e-02, 6.57483275e-02, 6.96726245e-02, 8.66766470e-03,
                        4.44297167e-02, 2.96906398e-02, 2.27247501e-02, 3.27700951e-02]])
 
-        actual_grads = backward.compute_softmax_gradient_vector_respect_to_weights(X, W, C)
+        actual_grads = backward.softmax_grad_wrt_weights(X, W, C)
         self.assertTrue(actual_grads.shape[0] == W.shape[0] and actual_grads.shape[1] == W.shape[1])
 
     def test_cross_entropy_softmax_lost(self):
