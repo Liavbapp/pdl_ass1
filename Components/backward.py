@@ -26,8 +26,6 @@ def backward_linear(WB, A_prev, Z_cur, dx, b=None):
     grad_x = jacT_wrt_x(Z_cur, WB, dx)
     grad_w = jacT_wrt_w(A_prev, Z_cur, dx)
     grad_b = jacT_wrt_b(Z_cur, dx)
-
-
     return grad_w, grad_x, grad_b
 
 

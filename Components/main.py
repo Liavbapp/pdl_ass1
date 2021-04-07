@@ -10,7 +10,7 @@ def main():
 
     num_features = train_x.shape[0]
     num_labels = train_y.shape[0]
-    layers_dim = [num_features, 5, 3, num_labels]
+    layers_dim = [num_features, 20, 20, 20, 20, 20, num_labels]
     wb_dict = auxiliary.initiate_wb_dict(layers_dim)  # dict of weights and bias
 
     for epoch in range(0, HyperParams.num_epochs):
