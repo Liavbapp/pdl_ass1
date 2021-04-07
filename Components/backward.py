@@ -9,7 +9,8 @@ def backward_pass(A_L, WB_dict, AZ_dict, C):
     grad_w, grad_x, grad_b = backward_softmax(C, WB_dict[f'W{num_layers}'], AZ_dict[f'A{num_layers - 1}'])
     grads_dict.update({f'grads{num_layers}': {"grad_w": grad_w, "grad_x": grad_x, "grad_b": grad_b}})
     for i in range(num_layers - 1, 0, -1):
-        grad_w, grad_x, grad_b = backward_linear(WB_dict[f'W{i}'], AZ_dict[f'A{i - 1}'], AZ_dict[f'Z{i}'], grad_x, WB_dict[f'b{i}'])
+        grad_w, grad_x, grad_b = backward_linear(WB_dict[f'W{i}'], AZ_dict[f'A{i - 1}'], AZ_dict[f'Z{i}'], grad_x,
+                                                 WB_dict[f'b{i}'])
         grads_dict.update({f'grads{i}': {"grad_w": grad_w, "grad_x": grad_x, "grad_b": grad_b}})
 
     return grads_dict
@@ -21,14 +22,11 @@ def backward_softmax(C, W, A_prev):
     return grad_w, grad_x, np.zeros((W.shape[0], 1))
 
 
-
 def backward_linear(WB, A_prev, Z_cur, dx, b=None):
-    m = A_prev.shape[1]
     grad_x = jacT_wrt_x(Z_cur, WB, dx)
-    grad_w = jacobianTMV_grad_w(A_prev, Z_cur, dx)
-    grad_b = jacobianTMV_grad_b(Z_cur, dx)
-    grad_b = (1 / m) * np.sum(grad_b, axis=1)
-    grad_b = grad_b.reshape(-1, 1)
+    grad_w = jacT_wrt_w(A_prev, Z_cur, dx)
+    grad_b = jacT_wrt_b(Z_cur, dx)
+
 
     return grad_w, grad_x, grad_b
 
@@ -65,12 +63,12 @@ def compute_softmax_gradient_vector_respect_to_data(A_pev, W, C):
     :return:
     """
     nominator = np.exp(np.matmul(W, A_pev))
-    denominator = np.sum(np.exp(np.matmul(W[k], A_pev)) for k in range(0, W.shape[0]))
+    denominator = sum(np.exp(np.matmul(W[k], A_pev)) for k in range(0, W.shape[0]))
     return 1 / A_pev.shape[1] * (np.matmul(W.T, nominator / denominator - C))
 
 
 # p 16 (w.r.t w)
-def jacobianTMV_grad_b(z, v):
+def jacT_wrt_b(z, v):
     """
     :param x:
     :param W:
@@ -80,13 +78,16 @@ def jacobianTMV_grad_b(z, v):
     """
     # wx_b = np.matmul(W, x) + b  # w * x + b
     # tanh_derv = derv_tanh(wx_b)  # tanh'(w*x +b)
+    m = z.shape[1]
     tanh_derv = derv_tanh(z)  # tanh'(w*x +b)
-    pair_wise_mult = np.multiply(tanh_derv, v)  # tanh_derv * v
-    return pair_wise_mult
+    pair_wise_mult = np.multiply(tanh_derv, v)
+    grad_b = (1 / m) * np.sum(pair_wise_mult, axis=1)
+    grad_b = grad_b.reshape(-1, 1)
+    return grad_b
 
 
 # p 16 (w.r.t w)
-def jacobianTMV_grad_w(a_prev, z, v):
+def jacT_wrt_w(a_prev, z, v):
     """
 
     :param a_prev:
