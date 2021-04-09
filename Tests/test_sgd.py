@@ -36,10 +36,13 @@ def compute_acc(X_samples, W, Y_samples):
     return accuracy
 
 
-def plt_acc(df_train_accuracy, df_test_accuracy):
+def plt_acc(df_train_accuracy, df_test_accuracy, data_set):
+    fig = plt.figure()
+    ax = fig.add_subplot()
+
     plt.plot(df_train_accuracy['epoch'], df_train_accuracy['acc'], 'g', label='training accuracy')
     plt.plot(df_test_accuracy['epoch'], df_test_accuracy['acc'], 'b', label='validation accuracy')
-    plt.title('Training and Validation accuracy')
+    plt.title(f'{data_set} Dataset,  Learning Rate={HyperParams.learning_rate}, Batch Size={HyperParams.batch_size}')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.legend()
@@ -49,7 +52,8 @@ def plt_acc(df_train_accuracy, df_test_accuracy):
 
 
 def run_test():
-    train_x, test_x, train_y, test_y = data_handler.load_data(DataSets.peaks)  # loading dataset
+    data_set = DataSets.peaks
+    train_x, test_x, train_y, test_y = data_handler.load_data(data_set)  # loading dataset
     train_x, test_x = data_handler.add_bias_neuron(train_x, test_x)
     train_x_samples, test_x_samples, train_y_samples, test_y_samples = generate_sub_samples(train_x, test_x, train_y,
                                                                                             test_y)
@@ -78,7 +82,7 @@ def run_test():
             W_new = update_weights(X_batch, W_old, Y_batch)
             W_old = W_new
 
-    plt_acc(pd.concat(acc_chunks_train), pd.concat(acc_chunks_test))
+    plt_acc(pd.concat(acc_chunks_train), pd.concat(acc_chunks_test), data_set)
 
 
 run_test()
