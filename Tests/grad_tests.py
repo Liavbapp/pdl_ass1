@@ -44,6 +44,7 @@ class GradTests(unittest.TestCase):
 
 
     def test_grad_cross_entropy_wrt_w(self, X=None, C=None, W_0=None):
+
         # X = np.array([[10, 5, 8, 6],
         #               [11, 3, 2, 5],
         #               [6, 1, 7, 4]])  # n=3,  m=4
