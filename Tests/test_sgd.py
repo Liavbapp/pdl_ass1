@@ -12,8 +12,8 @@ from Utils.Params import HyperParams, DataSets
 
 def generate_sub_samples(train_x, test_x, train_y, test_y):
     random.seed(42)
-    train_indices = random.sample(range(0, train_x.shape[1]), int(0.3 * train_x.shape[1]))
-    test_indices = random.sample(range(0, test_x.shape[1]), int(0.3 * test_x.shape[1]))
+    train_indices = random.sample(range(0, train_x.shape[1]), int(0.1 * train_x.shape[1]))
+    test_indices = random.sample(range(0, test_x.shape[1]), int(0.8 * test_x.shape[1]))
     train_x_samples = train_x[:, train_indices]
     train_y_samples = train_y[:, train_indices]
     test_x_samples = test_x[:, test_indices]
@@ -46,13 +46,17 @@ def plt_acc(df_train_accuracy, df_test_accuracy, data_set):
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.legend()
+    # file_name = f"lr={str(HyperParams.learning_rate).replace('.', '_')}_batch_size={str(HyperParams.batch_size)}.png"
+    # path = r'C:\Users\LiavB\OneDrive\Desktop\Msc\Semester_B\Practical Deep Learning\Ass\Ass1\Graphs\sgd_test\GMM'
+    # plt.savefig(path + f'\\{file_name}')
+
     plt.show()
 
 
 
 
 def run_test():
-    data_set = DataSets.peaks
+    data_set = DataSets.gmm
     train_x, test_x, train_y, test_y = data_handler.load_data(data_set)  # loading dataset
     train_x, test_x = data_handler.add_bias_neuron(train_x, test_x)
     train_x_samples, test_x_samples, train_y_samples, test_y_samples = generate_sub_samples(train_x, test_x, train_y,
@@ -86,3 +90,9 @@ def run_test():
 
 
 run_test()
+
+# for i in range(0, 4):
+#     HyperParams.learning_rate = 0.01 / (10 ** i)
+#     for j in range(3, 9):
+#         HyperParams.batch_size = 2**j
+#         run_test()
