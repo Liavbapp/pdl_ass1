@@ -15,12 +15,12 @@ def load_data(data_set):
 def shuffle_data(train_x, test_x, train_y, test_y):
     train_data = np.concatenate([train_x, train_y])
     test_data = np.concatenate([test_x, test_y])
-    np.random.shuffle(np.transpose(train_data)) #todo: uncomment
-    np.random.shuffle(np.transpose(test_data)) #todo: uncomment
+    np.random.shuffle(np.transpose(train_data))
+    np.random.shuffle(np.transpose(test_data))
     return train_data, test_data
 
 
-def initiate_batch(all_batches, batch_num, num_features):
+def initiate_batch(all_batches, batch_num, num_features, epoch):
     x_batch = all_batches[batch_num][0:num_features, :]  # all the features rows including bias
     y_batch = all_batches[batch_num][num_features:, :]  # the label rows
     return x_batch, y_batch

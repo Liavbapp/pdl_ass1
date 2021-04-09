@@ -12,8 +12,8 @@ from Utils.Params import HyperParams, DataSets
 
 def generate_sub_samples(train_x, test_x, train_y, test_y):
     random.seed(42)
-    train_indices = random.sample(range(0, train_x.shape[1]), int(0.05 * train_x.shape[1]))
-    test_indices = random.sample(range(0, test_x.shape[1]), int(0.05 * test_x.shape[1]))
+    train_indices = random.sample(range(0, train_x.shape[1]), int(0.6 * train_x.shape[1]))
+    test_indices = random.sample(range(0, test_x.shape[1]), int(0.6 * test_x.shape[1]))
     train_x_samples = train_x[:, train_indices]
     train_x_samples = np.append(train_x_samples, np.ones((1, train_x_samples.shape[1])), axis=0)
     train_y_samples = train_y[:, train_indices]
@@ -47,6 +47,7 @@ def plt_acc(df_train_accuracy, df_test_accuracy):
     plt.legend()
     plt.show()
 
+
 #
 # def plt_accuracy(train_x_samples, test_x_samples, train_y_samples, test_y_samples, W_old):
 #     train_accuracy = compute_acc(train_x_samples, W_old, train_y_samples)
@@ -63,9 +64,11 @@ def plt_acc(df_train_accuracy, df_test_accuracy):
 
 def run_test():
     train_x, test_x, train_y, test_y = data_handler.load_data(DataSets.swiss_roll)  # loading dataset
+    train_x, test_x = data_handler.add_bias_neuron(train_x, test_x)
     train_x_samples, test_x_samples, train_y_samples, test_y_samples = generate_sub_samples(train_x, test_x, train_y,
                                                                                             test_y)
-    num_features = train_x.shape[0] + 1   # added +1 to num_features because of the bias neuron
+
+    num_features = train_x.shape[0] + 1  # added +1 to num_features because of the bias neuron
     num_labels = train_y.shape[0]
     W_old = np.random.randn(num_labels, num_features) * np.sqrt(2 / num_labels)  # +1 for the bias neuron
     acc_chunks_train = []
@@ -81,16 +84,15 @@ def run_test():
             print(f'train acc: {train_accuracy}')
             print(f'test acc: {test_accuracy}')
 
-        train_x, test_x = data_handler.add_bias_neuron(train_x, test_x)
         train_data_batches, test_data_batches = data_handler.pre_processing(train_x, test_x, train_y, test_y,
                                                                             HyperParams.batch_size)
         for batch_i in range(0, len(train_data_batches)):
-            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features)
+
+            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features, epoch)
             W_new = update_weights(X_batch, W_old, Y_batch)
             W_old = W_new
 
     plt_acc(pd.concat(acc_chunks_train), pd.concat(acc_chunks_test))
 
+
 run_test()
-
-

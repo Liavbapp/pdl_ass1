@@ -19,7 +19,7 @@ def main():
                                                                             HyperParams.batch_size)
         # print("epoch num: ", epoch)
         for batch_i in range(0, len(train_data_batches)):
-            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features)
+            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features, epoch)
             A_L, A_dict = forward.forward_pass(X_batch, wb_dict)
             grads_dict = backward_pass(A_L, wb_dict, A_dict, Y_batch)
             wb_dict = sgd.update_wb(grads_dict, wb_dict, HyperParams.learning_rate)
