@@ -78,11 +78,10 @@ def run_test():
             print(f'train acc: {train_accuracy}')
             print(f'test acc: {test_accuracy}')
 
-        train_data_batches, test_data_batches = data_handler.pre_processing(train_x, test_x, train_y, test_y,
-                                                                            HyperParams.batch_size)
+        train_data_batches, test_data_batches = data_handler.pre_processing(train_x, test_x, HyperParams.batch_size)
         for batch_i in range(0, len(train_data_batches)):
 
-            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features, epoch)
+            X_batch, Y_batch = data_handler.initiate_batch(train_data_batches, batch_i, num_features)
             W_new = update_weights(X_batch, W_old, Y_batch)
             W_old = W_new
 

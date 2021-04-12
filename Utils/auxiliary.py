@@ -5,6 +5,7 @@ from Components import forward
 
 def initiate_wb_dict(layer_dims):
     """
+    initiating weights and biases for all layers in the network
     :param layer_dims: an array of the dimensions of each layer in the network
     :return: a dictionary containing the initialized W and b parameters of each layer
     """
@@ -16,6 +17,12 @@ def initiate_wb_dict(layer_dims):
 
 
 def compute_acc(prediction, Y_samples):
+    """
+    computing the accuracy
+    :param prediction: the predicted labels
+    :param Y_samples: the ground truth labels
+    :return:
+    """
     softmax_predictions = np.argmax(prediction, axis=0)
     true_labels_predictions = np.argmax(Y_samples, axis=0)
     accuracy = np.sum(softmax_predictions == true_labels_predictions) / prediction.shape[1]

@@ -6,8 +6,7 @@ def forward_pass(X, wb_dict):
     compute forward pass of the network
     :param X: Input Data - dimension: n (num features) x m (num samples)
     :param wb_dict: dictionary with Weights and biases for each layer of the network
-    :param C: the true labels (or the class which it actually belongs)  dimension: l (num labels) x m (num samples)
-    :return:
+    :return AL, AZ_dict: the activation of the last layer and dictionary of the Activation and Z values of the whole network
     """
     num_layers = len(wb_dict) // 2
     A_i = X
@@ -19,7 +18,7 @@ def forward_pass(X, wb_dict):
         AZ_dict.update({f'A{layer_i}': A_i, f'Z{layer_i}': Z_i})
 
     W_L = wb_dict[f'W{num_layers}']
-    Z_L = np.matmul(W_L, A_i)  # TODO: add bias here??
+    Z_L = np.matmul(W_L, A_i)
     A_L = softmax(Z_L)
     AZ_dict.update({f'A{num_layers}': A_L, f'Z{num_layers}': Z_L})
     return A_L, AZ_dict
@@ -73,9 +72,5 @@ def cross_entropy_softmax_lost(A_prev, W_L, C, with_eta=False):
         softmax_prob = np.log(np.exp(np.matmul(X_t, W_L[k]) - eta_lst) / softmax_denominator)
         loss += np.matmul(C[k], softmax_prob)
     loss *= (-1 / m)
-
-    # loss = (-1 / m) * sum(
-    #     np.matmul(C[k], np.log(np.exp(np.matmul(X_t, W[:, k]) - eta_lst) / softmax_denominator)) for k
-    #     in range(0, l))
 
     return loss
