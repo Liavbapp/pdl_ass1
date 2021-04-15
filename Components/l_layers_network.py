@@ -44,4 +44,8 @@ def train_complete_network(hidden_layers):
 
 
 if __name__ == '__main__':
-    train_complete_network([5, 10, 15, 20])
+    hidden_layers = [[20, 20, 20, 20, 20], [10, 5, 7], [14, 13, 15], [10, 10, 10, 10], [], [15], [2, 5], [10, 5],
+                     [20, 17, 15, 7], [20, 20, 20, 20, 20]]
+
+    for hidden_layer in hidden_layers:
+        train_complete_network(hidden_layer)
