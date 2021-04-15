@@ -10,7 +10,8 @@ class GradTests(unittest.TestCase):
 
     def test_whole_network(self, layers_dim, X, C):
         """
-        testing each layer of the network, with variety of length of layers. last layer with grad_test, others with jacb_test
+        testing each layer of the network, with variety of length of layers.
+         last layer with grad_test, others with jacb_test
         :param layers_dim: number of neurons in each layer
         :param X: input
         :param C: ground truth labels
@@ -42,6 +43,8 @@ class GradTests(unittest.TestCase):
             grads_dict.update({f'grads{i}': {"grad_w": grad_w, "grad_x": grad_x, "grad_b": grad_b}})
 
 
+
+
     def test_grad_cross_entropy_wrt_w(self, X=None, C=None, W_0=None):
         """
         testing the last layer of the network with cross_entroy w.r.t weights
@@ -56,18 +59,18 @@ class GradTests(unittest.TestCase):
         d_f = d.flatten()
 
         Fw = lambda W: forward.cross_entropy_softmax_lost(X, W, C)
-        Fw_delta = lambda W, epsilon: Fw(W) + np.matmul(epsilon * d_f, backward.softmax_grad_wrt_weights(X, W,
-                                                                                                         C).flatten()) + epsilon ** 2
+        softmax_grad = lambda W:  backward.softmax_grad_wrt_weights(X, W, C)
+        mul_short = lambda W, epsilon: np.matmul(epsilon * d_f, softmax_grad(W).flatten())
+        Fw_delta = lambda W, epsilon: Fw(W) + mul_short(W, epsilon) + epsilon ** 2
 
         res_sum1 = []
         res_sum2 = []
 
-        eps_0 = 0.001
+        eps_0 = 0.0001
         for i in range(0, 10):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(W_0, epsi) - Fw(W_0))
-            sum2 = abs(Fw_delta(W_0, epsi) - Fw(W_0) - np.matmul(epsi * d_f, backward.softmax_grad_wrt_weights(X, W_0,
-                                                                                                               C).flatten()))
+            sum2 = abs(Fw_delta(W_0, epsi) - Fw(W_0) - mul_short(W_0, epsi))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
 
@@ -91,18 +94,18 @@ class GradTests(unittest.TestCase):
         d_f = d.flatten()
 
         Fw = lambda x: np.inner(np.tanh(x).flatten(), u.flatten())
-        Fw_delta = lambda x, epsilon: Fw(x) + np.matmul(epsilon * d_f,
-                                                        backward.jacT_wrt_x(x, W_0, u).flatten()) + epsilon ** 2
+        jac_x = lambda x: backward.jacT_wrt_x(x, W_0, u)
+        short_mul = lambda x, epsilon: np.matmul(epsilon * d_f, jac_x(x).flatten())
+        Fw_delta = lambda x, epsilon: Fw(x) + short_mul(x, epsilon) + epsilon ** 2
 
         res_sum1 = []
         res_sum2 = []
-        eps_0 = 0.001
+        eps_0 = 0.0001
         input_x = np.matmul(W_0, X) + b
         for i in range(0, 10):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(input_x, epsi) - Fw(input_x))
-            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - np.matmul(epsi * d_f, backward.jacT_wrt_x(input_x, W_0,
-                                                                                                         u).flatten()))
+            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - short_mul(input_x, epsi))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
 
@@ -126,19 +129,18 @@ class GradTests(unittest.TestCase):
         d_f = d.flatten()
 
         Fw = lambda x: np.inner(np.tanh(x).flatten(), u.flatten())
-        Fw_delta = lambda x, epsilon: Fw(x) + np.matmul(epsilon * d_f,
-                                                        backward.jacT_wrt_b(x, u).flatten()) + epsilon ** 2
+        jac_b = lambda x: backward.jacT_wrt_b(x, u)
+        short_mul = lambda x, epsilon: np.matmul(epsilon * d_f, jac_b(x).flatten())
+        Fw_delta = lambda x, epsilon: Fw(x) + short_mul(x, epsilon) + epsilon ** 2
 
         res_sum1 = []
         res_sum2 = []
-        eps_0 = 0.001
+        eps_0 = 0.0001
         input_x = np.matmul(W_0, X) + b
         for i in range(0, 10):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(input_x, epsi) - Fw(input_x))
-            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - np.matmul(epsi * d_f,
-                                                                         backward.jacT_wrt_b(input_x,
-                                                                                             u).flatten()))
+            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - short_mul(input_x, epsi))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
 
@@ -162,18 +164,18 @@ class GradTests(unittest.TestCase):
         d_f = d.flatten()
 
         Fw = lambda x: np.inner(np.tanh(x).flatten(), u.flatten())
-        Fw_delta = lambda x, epsilon: Fw(x) + np.matmul(epsilon * d_f,
-                                                        backward.jacT_wrt_w(X, x, u).flatten()) + epsilon ** 2
+        jac_w = lambda input: backward.jacT_wrt_w(X, input, u)
+        short_mul = lambda x, epsilon: np.matmul(epsilon * d_f, jac_w(x).flatten())
+        Fw_delta = lambda x, epsilon: Fw(x) + short_mul(x, epsilon) + epsilon ** 2
 
         res_sum1 = []
         res_sum2 = []
-        eps_0 = 0.001
+        eps_0 = 0.0001
         input_x = np.matmul(W_0, X) + b
         for i in range(0, 10):
             epsi = (0.5 ** i) * eps_0
             sum1 = abs(Fw_delta(input_x, epsi) - Fw(input_x))
-            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - np.matmul(epsi * d_f,
-                                                                         backward.jacT_wrt_w(X, input_x, u).flatten()))
+            sum2 = abs(Fw_delta(input_x, epsi) - Fw(input_x) - short_mul(input_x, epsi))
             res_sum1.append(sum1)
             res_sum2.append(sum2)
 
