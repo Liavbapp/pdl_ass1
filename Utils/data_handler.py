@@ -1,3 +1,5 @@
+import random
+
 from scipy.io import loadmat
 import numpy as np
 
@@ -68,3 +70,22 @@ def pre_processing(train_x, train_y, batch_size):
     train_data_shf = shuffle_data(train_x, train_y)
     train_data_batches = np.array_split(train_data_shf, indices_or_sections=m // batch_size, axis=1)
     return train_data_batches
+
+
+def generate_sub_samples(train_x, test_x, train_y, test_y):
+    """
+    randomly subsample the two data sets
+    :param train_x:
+    :param test_x:
+    :param train_y:
+    :param test_y:
+    :return:
+    """
+    # random.seed(42)
+    train_indices = random.sample(range(0, train_x.shape[1]), int(1 * train_x.shape[1]))
+    test_indices = random.sample(range(0, test_x.shape[1]), int(1 * test_x.shape[1]))
+    train_x_samples = train_x[:, train_indices]
+    train_y_samples = train_y[:, train_indices]
+    test_x_samples = test_x[:, test_indices]
+    test_y_samples = test_y[:, test_indices]
+    return train_x_samples, test_x_samples, train_y_samples, test_y_samples
